@@ -9,25 +9,25 @@
             "value": "## TO BE DEFINED ##"
         },
         "AzureUserName": {
-            "type": "string",
-            "metadata": {
-                "description": "AzureUserName, AzurePassword, DeploymentID parameters are required for Azure Creds file, Must use in all Windows LabVMs"
-            }
+            "value": "GET-AZUSER-UPN"
         },
         "AzurePassword": {
-            "type": "securestring"
+            "value": "GET-AZUSER-PASSWORD"
         },
         "ODLID": {
-            "type": "string"
+            "value": "GET-ODL-ID"
         },
         "DeploymentID": {
-            "type": "string"
+            "value": "GET-DEPLOYMENT-ID"
+        },
+        "InstallCloudLabsShadow": {
+            "value": "yes"
         },    
         "fortiGateNamePrefix": {
             "value": "## TO BE DEFINED ##"
         },
         "fortiGateImageSKU": {
-            "value": "fortinet_fg-vm"
+            "value": "fortinet_fg-vm_payg_20190624"
         },
         "fortiGateImageVersion": {
             "value": "latest"
