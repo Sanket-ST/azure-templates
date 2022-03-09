@@ -3,10 +3,10 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "adminUsername": {
-            "value": "## TO BE DEFINED ##"
+            "value": "labuser"
         },
         "adminPassword": {
-            "value": "## TO BE DEFINED ##"
+            "value": "Password.1!!"
         },
         "AzureUserName": {
             "value": "GET-AZUSER-UPN"
@@ -24,7 +24,7 @@
             "value": "yes"
         },    
         "fortiGateNamePrefix": {
-            "value": "## TO BE DEFINED ##"
+            "value": "fgt-"
         },
         "fortiGateImageSKU": {
             "value": "fortinet_fg-vm_payg_20190624"
