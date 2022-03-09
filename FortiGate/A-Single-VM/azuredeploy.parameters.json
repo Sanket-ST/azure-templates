@@ -8,6 +8,21 @@
         "adminPassword": {
             "value": "## TO BE DEFINED ##"
         },
+        "AzureUserName": {
+            "type": "string",
+            "metadata": {
+                "description": "AzureUserName, AzurePassword, DeploymentID parameters are required for Azure Creds file, Must use in all Windows LabVMs"
+            }
+        },
+        "AzurePassword": {
+            "type": "securestring"
+        },
+        "ODLID": {
+            "type": "string"
+        },
+        "DeploymentID": {
+            "type": "string"
+        },    
         "fortiGateNamePrefix": {
             "value": "## TO BE DEFINED ##"
         },
