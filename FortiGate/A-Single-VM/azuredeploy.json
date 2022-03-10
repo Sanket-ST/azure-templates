@@ -40,6 +40,12 @@
           "description": "Required for CloudlabsShadow, value should be yes if you want to install otherwise no"
         }
       },
+      "trainerUserName": {
+          "type": "string"
+      },
+      "trainerUserPassword": {
+          "type": "string"
+      },    
       "fortiGateNamePrefix": {
         "type": "string",
         "metadata": {
