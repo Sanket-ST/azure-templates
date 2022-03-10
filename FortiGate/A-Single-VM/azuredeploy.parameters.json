@@ -112,6 +112,12 @@
         },
         "location": {
             "value": ""
-        }
+        },
+        "trainerUserName": {
+            "value": "trainer"
+        },
+        "trainerUserPassword": {
+            "value": "Password.!!1"
+        }    
     }
 }
