@@ -677,7 +677,7 @@
     "outputs": {
       "fortiGatePublicIP": {
         "type": "string",
-        "value": "[reference(parameters('publicIP1Name')).ipAddress]"
+        "value": "[if(and(equals(parameters('publicIP1NewOrExisting'), 'new'),equals(parameters('publicIP1AddressType'),'Standard')), reference(variables('publicIP1Id')).ipAddress, '')]"
       },
       "fortiGatePrivateIP1": {
         "type": "string",
