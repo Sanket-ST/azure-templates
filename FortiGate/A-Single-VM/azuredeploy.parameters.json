@@ -41,21 +41,6 @@
         "acceleratedNetworking": {
             "value": "false"
         },
-        "publicIP1NewOrExisting": {
-            "value": "new"
-        },
-        "publicIP1Name": {
-            "value": ""
-        },
-        "publicIP1ResourceGroup": {
-            "value": ""
-        },
-        "publicIP1AddressType": {
-            "value": "Static"
-        },
-        "publicIP1SKU": {
-            "value": "Standard"
-        },
         "vnetNewOrExisting": {
             "value": "new"
         },
