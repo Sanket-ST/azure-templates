@@ -491,7 +491,7 @@
         "properties": {
           "publicIPAllocationMethod": "[variables('publicIPAllocationMethod')]",
           "dnsSettings": {
-            "domainNameLabel": "[concat(toLower(variables('fgtVmName')), '-', uniquestring(resourceGroup().id))]"
+            "domainNameLabel": "[concat('https://', toLower(variables('fgtVmName')), '-', uniquestring(resourceGroup().id))]"
           }
         }
       },
@@ -627,6 +627,14 @@
       }
     ],
     "outputs": {
+      "adminUsername": {
+        "type": "string",
+        "value": "[parameters('adminUsername')]"
+      },
+      "adminPassword": {
+        "type": "string",
+        "value": "[parameters('adminPassword')]"
+      },    
       "fortiGatePublicIP": {
         "type": "string",
         "value": "[reference(variables('publicIpName')).ipAddress]"
