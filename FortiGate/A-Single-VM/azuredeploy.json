@@ -142,54 +142,6 @@
           "description": "Accelerated Networking enables direct connection between the VM and network card. Only available on 2 CPU F/Fs and 4 CPU D/Dsv2, D/Dsv3, E/Esv3, Fsv2, Lsv2, Ms/Mms and Ms/Mmsv2"
         }
       },
-      "publicIP1NewOrExisting": {
-        "type": "string",
-        "defaultValue": "new",
-        "allowedValues": [
-          "new",
-          "existing",
-          "none"
-        ],
-        "metadata": {
-          "description": "Choose between an existing or new public IP address linked to the external interface of the FortiGate VM"
-        }
-      },
-      "publicIP1Name": {
-        "type": "string",
-        "defaultValue": "",
-        "metadata": {
-          "description": "Name of Public IP address, if no name is provided the default name will be the Resource Group Name as the Prefix and '-FGT-PIP' as the suffix"
-        }
-      },
-      "publicIP1ResourceGroup": {
-        "type": "string",
-        "defaultValue": "",
-        "metadata": {
-          "description": "Public IP Resource Group, this value is required if an existing Public IP is selected"
-        }
-      },
-      "publicIP1AddressType": {
-        "type": "string",
-        "defaultValue": "Static",
-        "allowedValues": [
-          "Dynamic",
-          "Static"
-        ],
-        "metadata": {
-          "description": "Type of public IP address"
-        }
-      },
-      "publicIP1SKU": {
-        "type": "string",
-        "defaultValue": "Standard",
-        "allowedValues": [
-          "Basic",
-          "Standard"
-        ],
-        "metadata": {
-          "description": "Type of public IP address"
-        }
-      },
       "vnetNewOrExisting": {
         "type": "string",
         "defaultValue": "new",
@@ -364,11 +316,9 @@
       "serialConsoleStorageAccountName": "[concat('console', uniquestring(resourceGroup().id))]",
       "serialConsoleStorageAccountType": "Standard_LRS",
       "serialConsoleEnabled": "[if(equals(parameters('serialConsole'),'yes'),'true','false')]",
-      "publicIP1Name": "[if(equals(parameters('publicIP1Name'),''),concat(parameters('fortiGateNamePrefix'),'-FGT-PIP'),parameters('publicIP1Name'))]",
-      "publicIP1Id": "[if(equals(parameters('publicIP1NewOrExisting'),'new'),resourceId('Microsoft.Network/publicIPAddresses',variables('publicIP1Name')),resourceId(parameters('publicIP1ResourceGroup'),'Microsoft.Network/publicIPAddresses',variables('publicIP1Name')))]",
-      "publicIP1AddressId": {
-        "id": "[variables('publicIP1Id')]"
-      },
+      "publicIpName": "[concat(parameters('fortiGateNamePrefix'),'-FGT-PIP')]",
+      "publicIpAllocationMethod": "Static",
+      "publicIpSku": "Standard",
       "NSGName": "[concat(parameters('fortiGateNamePrefix'),'-',uniqueString(resourceGroup().id),'-NSG')]",
       "NSGId": "[resourceID('Microsoft.Network/networkSecurityGroups/',variables('NSGName'))]",
       "sn1IPArray": "[split(parameters('subnet1Prefix'),'.')]",
@@ -531,16 +481,15 @@
         }
       },
       {
-        "condition": "[equals(parameters('publicIP1NewOrExisting'), 'new')]",
         "type": "Microsoft.Network/publicIPAddresses",
         "apiVersion": "2020-04-01",
-        "name": "[variables('publicIP1Name')]",
+        "name": "[variables('publicIpName')]",
         "location": "[parameters('location')]",
         "sku": {
-          "name": "[parameters('publicIP1SKU')]"
+          "name": "[variables('publicIpSku')]"
         },
         "properties": {
-          "publicIPAllocationMethod": "[parameters('publicIP1AddressType')]",
+          "publicIPAllocationMethod": "[variables('publicIPAllocationMethod')]",
           "dnsSettings": {
             "domainNameLabel": "[concat(toLower(variables('fgtVmName')), '-', uniquestring(resourceGroup().id))]"
           }
@@ -552,6 +501,7 @@
         "name": "[variables('fgtNic1Name')]",
         "location": "[parameters('location')]",
         "dependsOn": [
+          "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpName'))]",
           "[variables('vnetName')]",
           "[variables('NSGId')]"
         ],
@@ -562,7 +512,9 @@
               "properties": {
                 "privateIPAddress": "[variables('sn1IPfgt')]",
                 "privateIPAllocationMethod": "Static",
-                "publicIPAddress": "[if(not(equals(parameters('publicIP1NewOrExisting'), 'none')), variables('publicIP1AddressId') , json('null'))]",
+                "publicIPAddress": {
+                    "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpName'))]"
+                },
                 "subnet": {
                   "id": "[variables('subnet1Id')]"
                 }
@@ -667,7 +619,7 @@
           },
           "diagnosticsProfile": {
             "bootDiagnostics": {
-              "enabled": "[variables('serialConsoleEnabled')]",
+              "enabled": false,
               "storageUri": "[if(equals(parameters('serialConsole'), 'yes'), reference(variables('serialConsoleStorageAccountName'), '2021-08-01').primaryEndpoints['blob'], json('null'))]"
             }
           }
@@ -677,7 +629,11 @@
     "outputs": {
       "fortiGatePublicIP": {
         "type": "string",
-        "value": "[if(and(equals(parameters('publicIP1NewOrExisting'), 'new'),equals(parameters('publicIP1AddressType'),'Standard')), reference(variables('publicIP1Id')).ipAddress, '')]"
+        "value": "[reference(variables('publicIpName')).ipAddress]"
+      },
+      "DeploymentID": {
+        "type": "string",
+        "value": "[parameters('DeploymentID')]"
       },
       "fortiGatePrivateIP1": {
         "type": "string",
@@ -689,7 +645,7 @@
       },  
       "fortiGateFQDN": {
         "type": "string",
-        "value": "[if(equals(parameters('publicIP1NewOrExisting'), 'new'), reference(variables('publicIP1Id')).dnsSettings.fqdn, '' )]"
+        "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpName'))).dnsSettings.fqdn]"
       }
     }
   }
