@@ -103,6 +103,18 @@
         },
         "trainerUserPassword": {
             "value": "Password.!!1"
-        }    
+        },
+        "vmName": {
+            "value": "apache-vm"
+        },
+        "virtualMachineComputerName": {
+            "value": "apache-vm"
+        },
+        "osDiskType": {
+            "value": "Standard_LRS"
+        },
+        "virtualMachineSize": {
+            "value": "Standard_B1s"
+        }
     }
 }
