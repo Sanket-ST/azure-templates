@@ -286,6 +286,20 @@
         "metadata": {
           "description": "Location for all resources."
         }
+      },
+      "vmName": {
+        "type": "string"
+      },
+      "virtualMachineComputerName": {
+        "type": "string"
+      },
+      "osDiskType": {
+        "type": "string",
+        "defaultValue": "Standard_LRS"
+      },
+      "virtualMachineSize": {
+        "type": "string",
+        "defaultValue": "Standard_B1s"
       }
     },
     "variables": {
@@ -342,7 +356,14 @@
       "sn2IPArray0": "[string(int(variables('sn2IPArray')[0]))]",
       "sn2GatewayIP": "[concat(variables('sn2IPArray0'),'.',variables('sn2IPArray1'),'.',variables('sn2IPArray2'),'.',variables('sn2IPArray3'))]",
       "sn2IPStartAddress": "[split(parameters('subnet2StartAddress'),'.')]",
-      "sn2IPfgt": "[concat(variables('sn2IPArray0'),'.',variables('sn2IPArray1'),'.',variables('sn2IPArray2'),'.',int(variables('sn2IPStartAddress')[3]))]"
+      "sn2IPfgt": "[concat(variables('sn2IPArray0'),'.',variables('sn2IPArray1'),'.',variables('sn2IPArray2'),'.',int(variables('sn2IPStartAddress')[3]))]",
+      "nicName": "[concat(parameters('vmName'), '-nic')]",
+      "networkSecurityGroupName": "[concat(parameters('vmName'), '-nsg')]",
+      "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]",
+      "publicIp1Name": "[concat(parameters('vmName'), '-pip')]",
+      "publicIp1Sku": "Standard",
+      "publicIp1AllocationMethod": "Static",
+      "subnet3Id": "[if(equals(parameters('vnetNewOrExisting'),'new'),resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'),parameters('subnet3Name')),resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks/subnets', variables('vnetName'),parameters('subnet3Name')))]"
     },
     "resources": [
       {
@@ -491,7 +512,7 @@
         "properties": {
           "publicIPAllocationMethod": "[variables('publicIPAllocationMethod')]",
           "dnsSettings": {
-            "domainNameLabel": "[concat('https://', toLower(variables('fgtVmName')), '-', uniquestring(resourceGroup().id))]"
+            "domainNameLabel": "[concat(toLower(variables('fgtVmName')), '-', uniquestring(resourceGroup().id))]"
           }
         }
       },
@@ -624,6 +645,153 @@
             }
           }
         }
+      },
+      {
+        "type": "Microsoft.Network/networkInterfaces",
+        "apiVersion": "2017-03-01",
+        "name": "[variables('nicName')]",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+          "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]",
+          "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIp1Name'))]"
+        ],
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "ipconfig1",
+              "properties": {
+                "subnet": {
+                  "id": "[variables('subnet3Id')]"
+                },
+                "privateIPAllocationMethod": "Static",
+                "privateIPAddress": "172.16.137.10",
+                "publicIPAddress": {
+                  "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIp1Name'))]"
+                }
+              }
+            }
+          ],
+          "networkSecurityGroup": {
+            "id": "[variables('nsgId')]"
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "apiVersion": "2019-02-01",
+        "name": "[variables('networkSecurityGroupName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "securityRules": [
+            {
+              "name": "HTTP",
+              "properties": {
+                "priority": 1010,
+                  "protocol": "Tcp",
+                  "access": "Allow",
+                  "direction": "Inbound",
+                  "sourceApplicationSecurityGroups": [],
+                  "destinationApplicationSecurityGroups": [],
+                  "sourceAddressPrefix": "*",
+                  "sourcePortRange": "*",
+                  "destinationAddressPrefix": "*",
+                  "destinationPortRange": "80"
+              }
+            },
+            {
+              "name": "HTTPS",
+              "properties": {
+                "priority": 1020,
+                  "protocol": "Tcp",
+                  "access": "Allow",
+                  "direction": "Inbound",
+                  "sourceApplicationSecurityGroups": [],
+                  "destinationApplicationSecurityGroups": [],
+                  "sourceAddressPrefix": "*",
+                  "sourcePortRange": "*",
+                  "destinationAddressPrefix": "*",
+                  "destinationPortRange": "443"
+              }
+            },
+            {
+              "name": "SSH",
+              "properties": {
+                "priority": 1030,
+                  "protocol": "Tcp",
+                  "access": "Allow",
+                  "direction": "Inbound",
+                  "sourceApplicationSecurityGroups": [],
+                  "destinationApplicationSecurityGroups": [],
+                  "sourceAddressPrefix": "*",
+                  "sourcePortRange": "*",
+                  "destinationAddressPrefix": "*",
+                  "destinationPortRange": "22"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "Microsoft.Network/publicIpAddresses",
+        "apiVersion": "2019-02-01",
+        "name": "[variables('publicIp1Name')]",
+        "location": "[resourceGroup().location]",
+        "sku": {
+          "name": "[variables('publicIp1Sku')]"
+        },
+        "properties": {
+          "publicIPAllocationMethod": "[variables('publicIp1AllocationMethod')]"
+        }
+      },
+      {
+        "type": "Microsoft.Compute/virtualMachines",
+        "apiVersion": "2017-03-30",
+        "name": "[parameters('vmName')]",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+          "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
+        ],
+        "plan": {
+          "name": "7-0",
+          "publisher": "bitnami",
+          "product": "tom-cat"
+        },
+        "properties": {
+          "hardwareProfile": {
+            "vmSize": "[parameters('virtualMachineSize')]"
+          },
+          "storageProfile": {
+            "osDisk": {
+              "createOption": "FromImage",
+              "managedDisk": {
+                "storageAccountType": "[parameters('osDiskType')]"
+              }
+            },
+            "imageReference": {
+              "publisher": "bitnami",
+              "offer": "tom-cat",
+              "sku": "7-0",
+              "version": "latest"
+            }
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
+              }
+            ]
+          },
+          "osProfile": {
+            "computerName": "[parameters('virtualMachineComputerName')]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword": "[parameters('adminPassword')]"
+          },
+          "diagnosticsProfile": {
+            "bootDiagnostics": {
+              "enabled": false
+            }
+          }
+        }
       }
     ],
     "outputs": {
@@ -634,7 +802,7 @@
       "adminPassword": {
         "type": "string",
         "value": "[parameters('adminPassword')]"
-      },    
+      },
       "fortiGatePublicIP": {
         "type": "string",
         "value": "[reference(variables('publicIpName')).ipAddress]"
@@ -653,7 +821,7 @@
       },  
       "fortiGateFQDN": {
         "type": "string",
-        "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpName'))).dnsSettings.fqdn]"
+        "value": "[concat('https://', reference(resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpName'))).dnsSettings.fqdn)]"
       }
     }
-  }
+  } 
