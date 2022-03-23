@@ -650,7 +650,6 @@
         "location": "[resourceGroup().location]",
         "dependsOn": [
           "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]",
-          "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIp1Name'))]"
         ],
         "properties": {
           "ipConfigurations": [
@@ -662,9 +661,6 @@
                 },
                 "privateIPAllocationMethod": "Static",
                 "privateIPAddress": "10.0.3.4",
-                "publicIPAddress": {
-                  "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIp1Name'))]"
-                }
               }
             }
           ],
