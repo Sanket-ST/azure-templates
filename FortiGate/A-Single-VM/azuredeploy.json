@@ -169,7 +169,7 @@
       },
       "vnetAddressPrefix": {
         "type": "string",
-        "defaultValue": "172.16.136.0/22",
+        "defaultValue": "10.20.0.0/24",
         "metadata": {
           "description": "Virtual Network Address prefix"
         }
@@ -183,14 +183,14 @@
       },
       "subnet1Prefix": {
         "type": "string",
-        "defaultValue": "172.16.136.0/26",
+        "defaultValue": "10.20.1.0/26",
         "metadata": {
           "description": "Subnet 1 Prefix"
         }
       },
       "subnet1StartAddress": {
         "type": "string",
-        "defaultValue": "172.16.136.4",
+        "defaultValue": "10.20.1.4",
         "metadata": {
           "description": "Subnet 1 start address, 1 consecutive private IPs are required"
         }
@@ -204,14 +204,14 @@
       },
       "subnet2Prefix": {
         "type": "string",
-        "defaultValue": "172.16.136.64/26",
+        "defaultValue": "10.20.2.0/26",
         "metadata": {
           "description": "Subnet 2 Prefix"
         }
       },
       "subnet2StartAddress": {
         "type": "string",
-        "defaultValue": "172.16.136.68",
+        "defaultValue": "10.20.2.8",
         "metadata": {
           "description": "Subnet 2 start address, 1 consecutive private IPs are required"
         }
@@ -225,7 +225,7 @@
       },
       "subnet3Prefix": {
         "type": "string",
-        "defaultValue": "172.16.137.0/24",
+        "defaultValue": "10.20.3.0/26",
         "metadata": {
           "description": "Subnet 3 Prefix"
         }
@@ -664,7 +664,7 @@
                   "id": "[variables('subnet2Id')]"
                 },
                 "privateIPAllocationMethod": "Static",
-                "privateIPAddress": "172.16.136.76",
+                "privateIPAddress": "10.20.2.16",
                 "publicIPAddress": {
                   "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIp1Name'))]"
                 }
