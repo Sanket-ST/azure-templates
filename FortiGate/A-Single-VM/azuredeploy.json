@@ -661,7 +661,6 @@
                 },
                 "privateIPAllocationMethod": "Static",
                 "privateIPAddress": "10.0.3.4",
-              }
             }
           ],
           "networkSecurityGroup": {
