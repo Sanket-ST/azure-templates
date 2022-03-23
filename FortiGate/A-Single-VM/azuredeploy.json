@@ -362,8 +362,7 @@
       "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]",
       "publicIp1Name": "[concat(parameters('vmName'), '-pip')]",
       "publicIp1Sku": "Standard",
-      "publicIp1AllocationMethod": "Static",
-      "subnet3Id": "[if(equals(parameters('vnetNewOrExisting'),'new'),resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'),parameters('subnet3Name')),resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks/subnets', variables('vnetName'),parameters('subnet3Name')))]"
+      "publicIp1AllocationMethod": "Static"
     },
     "resources": [
       {
@@ -653,7 +652,8 @@
         "location": "[resourceGroup().location]",
         "dependsOn": [
           "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]",
-          "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIp1Name'))]"
+          "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIp1Name'))]",
+          "[variables('vnetName')]"
         ],
         "properties": {
           "ipConfigurations": [
@@ -661,10 +661,10 @@
               "name": "ipconfig1",
               "properties": {
                 "subnet": {
-                  "id": "[variables('subnet3Id')]"
+                  "id": "[variables('subnet2Id')]"
                 },
                 "privateIPAllocationMethod": "Static",
-                "privateIPAddress": "172.16.137.10",
+                "privateIPAddress": "172.16.136.76",
                 "publicIPAddress": {
                   "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIp1Name'))]"
                 }
@@ -726,6 +726,34 @@
                   "sourcePortRange": "*",
                   "destinationAddressPrefix": "*",
                   "destinationPortRange": "22"
+              }
+            },
+            {
+              "name": "AllowAllInbound",
+              "properties": {
+                "description": "Allow all in",
+                "protocol": "*",
+                "sourcePortRange": "*",
+                "destinationPortRange": "*",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 101,
+                "direction": "Inbound"
+              }
+            },
+            {
+              "name": "AllowAllOutbound",
+              "properties": {
+                "description": "Allow all out",
+                "protocol": "*",
+                "sourcePortRange": "*",
+                "destinationPortRange": "*",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 103,
+                "direction": "Outbound"
               }
             }
           ]
