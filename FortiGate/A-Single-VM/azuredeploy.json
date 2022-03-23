@@ -169,7 +169,7 @@
       },
       "vnetAddressPrefix": {
         "type": "string",
-        "defaultValue": "10.20.0.0/24",
+        "defaultValue": "10.0.0.0/22",
         "metadata": {
           "description": "Virtual Network Address prefix"
         }
@@ -183,14 +183,14 @@
       },
       "subnet1Prefix": {
         "type": "string",
-        "defaultValue": "10.20.1.0/26",
+        "defaultValue": "10.0.1.0/24",
         "metadata": {
           "description": "Subnet 1 Prefix"
         }
       },
       "subnet1StartAddress": {
         "type": "string",
-        "defaultValue": "10.20.1.4",
+        "defaultValue": "10.0.1.4",
         "metadata": {
           "description": "Subnet 1 start address, 1 consecutive private IPs are required"
         }
@@ -204,14 +204,14 @@
       },
       "subnet2Prefix": {
         "type": "string",
-        "defaultValue": "10.20.2.0/26",
+        "defaultValue": "10.0.2.0/24",
         "metadata": {
           "description": "Subnet 2 Prefix"
         }
       },
       "subnet2StartAddress": {
         "type": "string",
-        "defaultValue": "10.20.2.8",
+        "defaultValue": "10.0.2.4",
         "metadata": {
           "description": "Subnet 2 start address, 1 consecutive private IPs are required"
         }
@@ -225,7 +225,7 @@
       },
       "subnet3Prefix": {
         "type": "string",
-        "defaultValue": "10.20.3.0/26",
+        "defaultValue": "10.0.3.0/24",
         "metadata": {
           "description": "Subnet 3 Prefix"
         }
@@ -360,9 +360,7 @@
       "nicName": "[concat(parameters('vmName'), '-nic')]",
       "networkSecurityGroupName": "[concat(parameters('vmName'), '-nsg')]",
       "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]",
-      "publicIp1Name": "[concat(parameters('vmName'), '-pip')]",
-      "publicIp1Sku": "Standard",
-      "publicIp1AllocationMethod": "Static"
+      "subnet3Id": "[if(equals(parameters('vnetNewOrExisting'),'new'),resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'),parameters('subnet1Name')),resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks/subnets', variables('vnetName'),parameters('subnet3Name')))]"  
     },
     "resources": [
       {
@@ -652,19 +650,18 @@
         "location": "[resourceGroup().location]",
         "dependsOn": [
           "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]",
-          "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIp1Name'))]",
-          "[variables('vnetName')]"
+          "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIp1Name'))]"
         ],
         "properties": {
           "ipConfigurations": [
             {
-              "name": "ipconfig1",
+              "name": "ipconfig2",
               "properties": {
                 "subnet": {
-                  "id": "[variables('subnet2Id')]"
+                  "id": "[variables('subnet3Id')]"
                 },
                 "privateIPAllocationMethod": "Static",
-                "privateIPAddress": "10.20.2.16",
+                "privateIPAddress": "10.0.3.4",
                 "publicIPAddress": {
                   "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIp1Name'))]"
                 }
@@ -757,18 +754,6 @@
               }
             }
           ]
-        }
-      },
-      {
-        "type": "Microsoft.Network/publicIpAddresses",
-        "apiVersion": "2019-02-01",
-        "name": "[variables('publicIp1Name')]",
-        "location": "[resourceGroup().location]",
-        "sku": {
-          "name": "[variables('publicIp1Sku')]"
-        },
-        "properties": {
-          "publicIPAllocationMethod": "[variables('publicIp1AllocationMethod')]"
         }
       },
       {
