@@ -649,8 +649,7 @@
         "name": "[variables('nicName')]",
         "location": "[resourceGroup().location]",
         "dependsOn": [
-          "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]",
-          "[variables('vnetName')]"
+          "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
         ],
         "properties": {
           "ipConfigurations": [
