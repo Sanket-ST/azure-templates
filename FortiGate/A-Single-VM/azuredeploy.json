@@ -211,7 +211,7 @@
       },
       "subnet2StartAddress": {
         "type": "string",
-        "defaultValue": "10.0.2.4",
+        "defaultValue": "10.10.2.4",
         "metadata": {
           "description": "Subnet 2 start address, 1 consecutive private IPs are required"
         }
@@ -312,6 +312,7 @@
       "vnetName": "[if(equals(parameters('vnetName'),''),concat(parameters('fortiGateNamePrefix'),'-VNET'),parameters('vnetName'))]",
       "subnet1Id": "[if(equals(parameters('vnetNewOrExisting'),'new'),resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'),parameters('subnet1Name')),resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks/subnets', variables('vnetName'),parameters('subnet1Name')))]",
       "subnet2Id": "[if(equals(parameters('vnetNewOrExisting'),'new'),resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'),parameters('subnet2Name')),resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks/subnets', variables('vnetName'),parameters('subnet2Name')))]",
+      "subnet3Id": "[if(equals(parameters('vnetNewOrExisting'),'new'),resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'),parameters('subnet3Name')),resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks/subnets', variables('vnetName'),parameters('subnet3Name')))]",
       "fgtVmName": "[concat('fortigatevm-', parameters('DeploymentID'))]",
       "fmgCustomData": "[if(equals(parameters('fortiManager'),'yes'),concat('\nconfig system central-management\nset type fortimanager\n set fmg ',parameters('fortiManagerIP'),'\nset serial-number ', parameters('fortiManagerSerial'), '\nend\n config system interface\n edit port1\n append allowaccess fgfm\n end\n config system interface\n edit port2\n append allowaccess fgfm\n end\n'),'')]",
       "customDataFlexVM": "[if(equals(parameters('fortiGateLicenseFlexVM'),''),'',concat('exec vm-license ',parameters('fortiGateLicenseFlexVM'), '\n'))]",
@@ -359,8 +360,7 @@
       "sn2IPfgt": "[concat(variables('sn2IPArray0'),'.',variables('sn2IPArray1'),'.',variables('sn2IPArray2'),'.',int(variables('sn2IPStartAddress')[3]))]",
       "nicName": "[concat(parameters('vmName'), '-nic')]",
       "networkSecurityGroupName": "[concat(parameters('vmName'), '-nsg')]",
-      "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]",
-      "subnet3Id": "[if(equals(parameters('vnetNewOrExisting'),'new'),resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'),parameters('subnet1Name')),resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks/subnets', variables('vnetName'),parameters('subnet3Name')))]"  
+      "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
     },
     "resources": [
       {
@@ -650,17 +650,19 @@
         "location": "[resourceGroup().location]",
         "dependsOn": [
           "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]",
+          "[variables('vnetName')]"
         ],
         "properties": {
           "ipConfigurations": [
             {
-              "name": "ipconfig2",
+              "name": "ipconfig1",
               "properties": {
                 "subnet": {
                   "id": "[variables('subnet3Id')]"
                 },
                 "privateIPAllocationMethod": "Static",
-                "privateIPAddress": "10.0.3.4",
+                "privateIPAddress": "10.0.3.4"
+              }
             }
           ],
           "networkSecurityGroup": {
