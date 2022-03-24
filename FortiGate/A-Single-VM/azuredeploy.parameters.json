@@ -51,31 +51,31 @@
             "value": ""
         },
         "vnetAddressPrefix": {
-            "value": "172.16.136.0/22"
+            "value": "10.0.0.0/22"
         },
         "subnet1Name": {
             "value": "ExternalSubnet"
         },
         "subnet1Prefix": {
-            "value": "172.16.136.0/26"
+            "value": "10.0.1.0/24"
         },
         "subnet1StartAddress": {
-            "value": "172.16.136.4"
+            "value": "10.0.1.4"
         },
         "subnet2Name": {
             "value": "InternalSubnet"
         },
         "subnet2Prefix": {
-            "value": "172.16.136.64/26"
+            "value": "10.0.2.0/24"
         },
         "subnet2StartAddress": {
-            "value": "172.16.136.68"
+            "value": "10.0.2.4"
         },
         "subnet3Name": {
             "value": "ProtectedASubnet"
         },
         "subnet3Prefix": {
-            "value": "172.16.137.0/24"
+            "value": "10.0.3.0/24"
         },
         "serialConsole": {
             "value": "yes"
