@@ -552,7 +552,8 @@
       "name": "[variables('fgtNic2Name')]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[variables('vnetName')]"
+        "[variables('vnetName')]",
+        "[variables('NSGId')]"
       ],
       "properties": {
         "ipConfigurations": [
@@ -649,8 +650,7 @@
       "name": "[variables('nicName')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]",
-        "[variables('vnetName')]"
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
       ],
       "properties": {
         "ipConfigurations": [
@@ -832,6 +832,10 @@
     "fortiGateFQDN": {
       "type": "string",
       "value": "[concat('https://', reference(resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpName'))).dnsSettings.fqdn)]"
+    },
+    "ApacheFQDN": {
+      "type": "string",
+      "value": "[concat('http://', reference(resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpName'))).dnsSettings.fqdn)]"
     }
   }
 } 
