@@ -651,7 +651,7 @@
       "location": "[resourceGroup().location]",
       "dependsOn": [
         "[variables('nsgId')]",
-        "[variables('vnetName')]",
+        "[variables('vnetName')]"
       ],
       "properties": {
         "ipConfigurations": [
