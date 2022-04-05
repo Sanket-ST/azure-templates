@@ -829,6 +829,10 @@
     "fortiGatePrivateIP2": {
       "type": "string",
       "value": "[reference(variables('fgtNic2Name')).ipConfigurations[0].properties.privateIPAddress]"
+    },
+    "ApachePrivateIP": {
+      "type": "string",
+      "value": "[reference(variables('nicName')).ipConfigurations[0].properties.privateIPAddress]"
     },  
     "fortiGateFQDN": {
       "type": "string",
