@@ -96,7 +96,7 @@
             "value": ""
         },
         "location": {
-            "value": ""
+            "value": "[resourceGroup().location]"
         },
         "trainerUserName": {
             "value": "trainer"
